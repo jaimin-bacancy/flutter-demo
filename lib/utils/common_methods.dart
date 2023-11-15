@@ -42,4 +42,14 @@ class CommonMethods {
   static onBackPress() async {
     SystemNavigator.pop();
   }
+
+  static showAlert(BuildContext context, String content) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text(content),
+          );
+        });
+  }
 }

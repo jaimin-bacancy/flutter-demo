@@ -11,6 +11,16 @@ class Response<T> {
     required this.data,
   });
 
+  factory Response.fromJsonWithT(
+      Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
+    return Response<T>(
+      isSuccess: json['isSuccess'] as bool,
+      message: json['message'] as String,
+      code: json['code'] as int,
+      data: fromJsonT(json['data']),
+    );
+  }
+
   factory Response.fromJson(Map<String, dynamic> json) {
     return Response<T>(
       isSuccess: json['isSuccess'] as bool,

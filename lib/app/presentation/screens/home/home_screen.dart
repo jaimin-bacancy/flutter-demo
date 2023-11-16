@@ -1,32 +1,103 @@
+import 'package:awesome_app/app/data/models/user.dart';
+import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/presentation/screens/add_edit_user/add_edit_user.dart';
+import 'package:awesome_app/app/presentation/screens/startup/startup_screen.dart';
+import 'package:awesome_app/base_configs/configs/string_config.dart';
+import 'package:awesome_app/utils/common_methods.dart';
+import 'package:awesome_app/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<User> _usersList = [];
+
+  void fetchMyUsers() {
+    ApiClient().getMyUsersApi().then((value) {
+      List<User> list = usersFromJson(value.data);
+      setState(() {
+        _usersList = list;
+      });
+    }).onError((error, stackTrace) {
+      CommonMethods.showAlert(context, (error.toString()));
+    });
+  }
+
+  void deleteMyUser(String id) {
+    ApiClient().deleteMyUserApi(id).then((value) {
+      List<User> list = usersFromJson(value.data);
+      setState(() {
+        _usersList = list;
+      });
+    }).onError((error, stackTrace) {
+      CommonMethods.showAlert(context, (error.toString()));
+    });
+  }
+
+  void onItemTap(User user) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => AddEditUser(user: user)))
+        .then((val) {
+      if (val is bool) {
+        fetchMyUsers();
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    fetchMyUsers();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.add,
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const AddEditUser();
-              }));
-            },
-          )
-        ],
-        title: const Text("Users"),
-      ),
+      appBar: AppBar(actions: <Widget>[
+        IconButton(
+          icon: const Icon(
+            Icons.add,
+          ),
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => AddEditUser()))
+                .then((val) {
+              if (val is bool) {
+                fetchMyUsers();
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.logout,
+          ),
+          onPressed: () async {
+            await SharedPrefUtils().clearSharedPref();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const StartupScreen(),
+              ),
+            );
+          },
+        )
+      ], title: const Text(StringConfig.usersText)),
       body: Container(
-        child: ListView(
-          children: List.generate(100, (index) {
-            return HomeListItem(label: index.toString(), index: index);
-          }),
+        child: ListView.builder(
+          itemCount: _usersList.length,
+          itemBuilder: (context, index) {
+            return HomeListItem(
+                user: _usersList[index],
+                index: index,
+                onItemTap: () => onItemTap(_usersList[index]),
+                onDeleteTap: () => deleteMyUser(_usersList[index].id));
+          },
         ),
       ),
     );
@@ -34,15 +105,23 @@ class HomeScreen extends StatelessWidget {
 }
 
 class HomeListItem extends StatelessWidget {
-  const HomeListItem({super.key, required this.label, required this.index});
-  final String label;
+  const HomeListItem(
+      {super.key,
+      required this.user,
+      required this.index,
+      required this.onDeleteTap,
+      required this.onItemTap});
+
+  final User user;
   final int index;
+  final Function onDeleteTap;
+  final Function onItemTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: Colors.transparent,
-      onTap: () => {print("User ${index + 1} clicked")},
+      onTap: () => {onItemTap()},
       child: Container(
         padding: const EdgeInsets.all(8),
         margin: const EdgeInsets.all(8),
@@ -68,17 +147,22 @@ class HomeListItem extends StatelessWidget {
                     size: 24,
                   ),
                 ),
-                Text(
-                  "User ${index + 1}",
-                  style: const TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(user.name,
+                        maxLines: 1,
+                        style: const TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.bold)),
+                    Text(user.email,
+                        maxLines: 1,
+                        style: const TextStyle(color: Colors.black)),
+                  ],
+                )
               ],
             ),
             InkWell(
-              onTap: () {
-                print("User ${index + 1} delete called");
-              },
+              onTap: () => {onDeleteTap()},
               child: const Icon(
                 Icons.delete,
                 size: 24,

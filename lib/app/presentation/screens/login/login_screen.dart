@@ -7,6 +7,7 @@ import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
+import 'package:awesome_app/utils/shared_pref_utils.dart';
 import 'package:awesome_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +17,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(StringConfig.loginText),
-        ),
+        appBar: AppBar(title: const Text(StringConfig.loginText)),
         body: const LoginForm());
   }
 }
@@ -43,15 +42,17 @@ class _LoginFormState extends State<LoginForm> {
       CommonMethods.showAlert(
           context, Validation.validatePassword(_password) ?? "");
     } else {
-      ApiClient()
-          .userLoginApi(_email, _password)
-          .then((value) => {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const HomeScreen();
-                }))
-              })
-          .onError((error, stackTrace) =>
-              {CommonMethods.showAlert(context, (error.toString()))});
+      ApiClient().userLoginApi(_email, _password).then((value) {
+        SharedPrefUtils().setUserToken(value.data.token);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+        );
+      }).onError((error, stackTrace) {
+        CommonMethods.showAlert(context, (error.toString()));
+      });
     }
   }
 
@@ -66,7 +67,9 @@ class _LoginFormState extends State<LoginForm> {
           placeholderText: StringConfig.enterEmailText,
           textInputAction: TextInputAction.next,
           textInputType: TextInputType.emailAddress,
-          onChanged: (text) => {_email = text},
+          onChanged: (text) {
+            _email = text;
+          },
           validator: (value) {
             return Validation.validateEmail(value!);
           },
@@ -79,7 +82,9 @@ class _LoginFormState extends State<LoginForm> {
           obscureText: true,
           textInputAction: TextInputAction.done,
           textInputType: TextInputType.visiblePassword,
-          onChanged: (text) => {_password = text},
+          onChanged: (text) {
+            _password = text;
+          },
           validator: (value) {
             return Validation.validatePassword(value!);
           },
@@ -90,7 +95,9 @@ class _LoginFormState extends State<LoginForm> {
             Center(
                 child: FormButton(
               label: StringConfig.submit,
-              onButtonPress: () => onSubmitPress(context),
+              onButtonPress: () {
+                onSubmitPress(context);
+              },
             )),
             const SizedBox(height: 12),
             const RegisterView()
@@ -120,7 +127,7 @@ class RegisterView extends StatelessWidget {
           style: TextStyle(fontSize: 14),
         ),
         InkWell(
-            onTap: () => onRegisterPress(context),
+            onTap: () => {onRegisterPress(context)},
             child: const Text(StringConfig.registerText,
                 style: TextStyle(
                     color: Colors.amber,

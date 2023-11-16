@@ -12,9 +12,7 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(StringConfig.registerText),
-        ),
+        appBar: AppBar(title: const Text(StringConfig.registerText)),
         body: const RegisterForm());
   }
 }
@@ -61,7 +59,9 @@ class _RegisterFormState extends State<RegisterForm> {
           placeholderText: StringConfig.enterNameText,
           textInputAction: TextInputAction.next,
           textInputType: TextInputType.emailAddress,
-          onChanged: (text) => {_name = text},
+          onChanged: (text) {
+            _name = text;
+          },
         ),
         const SizedBox(height: 12),
         FormInput(
@@ -70,7 +70,9 @@ class _RegisterFormState extends State<RegisterForm> {
           placeholderText: StringConfig.enterEmailText,
           textInputAction: TextInputAction.next,
           textInputType: TextInputType.emailAddress,
-          onChanged: (text) => {_email = text},
+          onChanged: (text) {
+            _email = text;
+          },
         ),
         const SizedBox(height: 12),
         FormInput(
@@ -80,7 +82,9 @@ class _RegisterFormState extends State<RegisterForm> {
           obscureText: true,
           textInputAction: TextInputAction.done,
           textInputType: TextInputType.visiblePassword,
-          onChanged: (text) => {_password = text},
+          onChanged: (text) {
+            _password = text;
+          },
         ),
         const SizedBox(height: 12),
         Column(
@@ -88,7 +92,9 @@ class _RegisterFormState extends State<RegisterForm> {
             Center(
                 child: FormButton(
               label: StringConfig.submit,
-              onButtonPress: () => onSubmitPress(context),
+              onButtonPress: () {
+                onSubmitPress(context);
+              },
             )),
             const SizedBox(height: 12),
             const RegisterView()
@@ -116,7 +122,9 @@ class RegisterView extends StatelessWidget {
           style: TextStyle(fontSize: 14),
         ),
         InkWell(
-            onTap: () => onLoginPress(context),
+            onTap: () {
+              onLoginPress(context);
+            },
             child: const Text(StringConfig.loginText,
                 style: TextStyle(
                     color: Colors.amber,

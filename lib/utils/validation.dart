@@ -5,7 +5,8 @@ class Validation {
 
   // Email validation
   static String? validateEmail(String value) {
-    String pattern = r'^\S+@\S+$';
+    String pattern =
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
     RegExp regExp = RegExp(pattern);
     if (value.isEmpty) {
       return StringConfig.pleaseEnterEmail;

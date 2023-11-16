@@ -7,12 +7,18 @@ abstract class ApiConfig {
 
   // Header Parameters
   static const String authorization = 'Authorization';
+  static const String contentType = 'Content-Type';
   static const String accessToken = 'access_token';
   static const String bearer = 'Bearer';
 
   // Api End Points
+  static const String user = 'user';
   static const String login = 'user/login';
   static const String register = 'user/register';
+  static const String myUsers = 'user/myUsers';
+  static const String addUser = 'user/addUser';
+  static const String removeUser = 'removeUser';
+  static const String updateUser = 'updateUser';
 
   // Api Parameters
   static const String email = 'email';

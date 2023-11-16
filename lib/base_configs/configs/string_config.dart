@@ -16,9 +16,19 @@ abstract class StringConfig {
   static const String enterNameText = 'Enter name';
   static const String alreadyUserText = "Already a user? ";
 
+  //Users Screen
+  static const String usersText = 'Users';
+
+  //Add User Screen
+  static const String addUserText = "Add User";
+
+  //Edit User Screen
+  static const String editUserText = "Edit User";
+
   // Field validations
   static const String fieldCannotBeEmpty = 'This field cann\'t be empty';
   static const String pleaseEnterPassword = 'Please enter password';
+  static const String pleaseEnterName = 'Please enter name';
   static const String passwordLengthError =
       'The password must be at least 8 characters';
   static const String specialCharValidation =

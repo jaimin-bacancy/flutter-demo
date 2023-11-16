@@ -1,3 +1,6 @@
+List<User> usersFromJson(dynamic str) =>
+    List<User>.from(str.map((x) => User.fromJson(x)));
+
 class User {
   final String id;
   final String name;

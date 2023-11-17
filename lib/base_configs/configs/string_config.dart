@@ -21,6 +21,7 @@ abstract class StringConfig {
 
   //Add User Screen
   static const String addUserText = "Add User";
+  static const String selectDobText = "Select DOB";
 
   //Edit User Screen
   static const String editUserText = "Edit User";

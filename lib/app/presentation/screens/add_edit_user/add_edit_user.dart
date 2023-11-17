@@ -1,6 +1,7 @@
 import 'package:awesome_app/app/data/models/user.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
+import 'package:awesome_app/app/presentation/widgets/form_date_picker.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
 import 'package:awesome_app/app/presentation/widgets/user_image.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
@@ -37,6 +38,7 @@ class _AddEditUserFormState extends State<AddEditUserForm> {
   String _email = "";
   XFile? _profileImage;
   IconData _icon = Icons.add_a_photo;
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -82,6 +84,20 @@ class _AddEditUserFormState extends State<AddEditUserForm> {
       setState(() {});
     }
 
+    Future<void> _selectDate(BuildContext context) async {
+      final DateTime? picked = await showDatePicker(
+          context: context,
+          initialDate: selectedDate,
+          firstDate: DateTime(1947),
+          lastDate: DateTime.now());
+
+      if (picked != null && picked != selectedDate) {
+        setState(() {
+          selectedDate = picked;
+        });
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -111,6 +127,12 @@ class _AddEditUserFormState extends State<AddEditUserForm> {
           onChanged: (text) {
             _email = text;
           },
+        ),
+        const SizedBox(height: 12),
+        FormDatePicker(
+          label: StringConfig.selectDobText,
+          selectDate: _selectDate,
+          selectedDate: selectedDate,
         ),
         const SizedBox(height: 12),
         Column(

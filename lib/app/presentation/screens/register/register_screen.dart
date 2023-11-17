@@ -1,10 +1,12 @@
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
+import 'package:awesome_app/app/presentation/widgets/user_image.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
 import 'package:awesome_app/utils/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -28,6 +30,8 @@ class _RegisterFormState extends State<RegisterForm> {
   String _name = "";
   String _email = "";
   String _password = "";
+  XFile? _profileImage;
+  IconData _icon = Icons.add_a_photo;
 
   void onSubmitPress(context) {
     if (_email.isEmpty || _password.isEmpty || _name.isEmpty) {
@@ -50,9 +54,24 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    void handleImageSelect() async {
+      final ImagePicker picker = ImagePicker();
+      _profileImage = await picker.pickImage(source: ImageSource.gallery);
+      if (_profileImage != null) {
+        _icon = Icons.edit;
+      }
+      setState(() {});
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UserImage(
+          image: _profileImage,
+          onImageSelect: handleImageSelect,
+          icon: _icon,
+        ),
+        const SizedBox(height: 12),
         FormInput(
           initialValue: _name,
           label: StringConfig.nameText,

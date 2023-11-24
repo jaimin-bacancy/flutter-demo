@@ -9,6 +9,7 @@ class FormInput extends StatefulWidget {
   final TextEditingController? controller;
   final FormFieldValidator<String>? validator;
   final String? initialValue;
+  final bool? enabled;
   final Function(String) onChanged;
 
   const FormInput({
@@ -21,6 +22,7 @@ class FormInput extends StatefulWidget {
     this.controller,
     this.validator,
     this.initialValue,
+    this.enabled,
     required this.onChanged,
   });
 
@@ -40,6 +42,7 @@ class _FormInputState extends State<FormInput> {
         ),
         const SizedBox(height: 4),
         TextFormField(
+          enabled: widget.enabled,
           initialValue: widget.initialValue,
           validator: widget.validator,
           controller: widget.controller,

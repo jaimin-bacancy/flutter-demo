@@ -30,9 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void deleteMyUser(String id) {
     ApiClient().deleteMyUserApi(id).then((value) {
-      List<User> list = usersFromJson(value.data);
+      User deletedUser = User.fromJson(value.data);
       setState(() {
-        _usersList = list;
+        _usersList.removeWhere((e) => e.id == deletedUser.id);
       });
     }).onError((error, stackTrace) {
       CommonMethods.showAlert(context, (error.toString()));

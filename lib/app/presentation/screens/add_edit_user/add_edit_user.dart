@@ -120,6 +120,7 @@ class _AddEditUserFormState extends State<AddEditUserForm> {
         const SizedBox(height: 12),
         FormInput(
           initialValue: _email,
+          enabled: widget.user?.id == null,
           label: StringConfig.emailIdText,
           placeholderText: StringConfig.enterEmailText,
           textInputAction: TextInputAction.next,

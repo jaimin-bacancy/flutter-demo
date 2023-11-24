@@ -14,6 +14,7 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(title: const Text(StringConfig.registerText)),
         body: const RegisterForm());
   }
@@ -63,63 +64,65 @@ class _RegisterFormState extends State<RegisterForm> {
       setState(() {});
     }
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UserImage(
-          image: _profileImage,
-          onImageSelect: handleImageSelect,
-          icon: _icon,
-        ),
-        const SizedBox(height: 12),
-        FormInput(
-          initialValue: _name,
-          label: StringConfig.nameText,
-          placeholderText: StringConfig.enterNameText,
-          textInputAction: TextInputAction.next,
-          textInputType: TextInputType.emailAddress,
-          onChanged: (text) {
-            _name = text;
-          },
-        ),
-        const SizedBox(height: 12),
-        FormInput(
-          initialValue: _email,
-          label: StringConfig.emailIdText,
-          placeholderText: StringConfig.enterEmailText,
-          textInputAction: TextInputAction.next,
-          textInputType: TextInputType.emailAddress,
-          onChanged: (text) {
-            _email = text;
-          },
-        ),
-        const SizedBox(height: 12),
-        FormInput(
-          initialValue: _password,
-          label: StringConfig.passwordText,
-          placeholderText: StringConfig.enterPasswordText,
-          obscureText: true,
-          textInputAction: TextInputAction.done,
-          textInputType: TextInputType.visiblePassword,
-          onChanged: (text) {
-            _password = text;
-          },
-        ),
-        const SizedBox(height: 12),
-        Column(
-          children: [
-            Center(
-                child: FormButton(
-              label: StringConfig.submit,
-              onButtonPress: () {
-                onSubmitPress(context);
-              },
-            )),
-            const SizedBox(height: 12),
-            const RegisterView()
-          ],
-        ),
-      ]),
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UserImage(
+            image: _profileImage,
+            onImageSelect: handleImageSelect,
+            icon: _icon,
+          ),
+          const SizedBox(height: 12),
+          FormInput(
+            initialValue: _name,
+            label: StringConfig.nameText,
+            placeholderText: StringConfig.enterNameText,
+            textInputAction: TextInputAction.next,
+            textInputType: TextInputType.emailAddress,
+            onChanged: (text) {
+              _name = text;
+            },
+          ),
+          const SizedBox(height: 12),
+          FormInput(
+            initialValue: _email,
+            label: StringConfig.emailIdText,
+            placeholderText: StringConfig.enterEmailText,
+            textInputAction: TextInputAction.next,
+            textInputType: TextInputType.emailAddress,
+            onChanged: (text) {
+              _email = text;
+            },
+          ),
+          const SizedBox(height: 12),
+          FormInput(
+            initialValue: _password,
+            label: StringConfig.passwordText,
+            placeholderText: StringConfig.enterPasswordText,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            textInputType: TextInputType.visiblePassword,
+            onChanged: (text) {
+              _password = text;
+            },
+          ),
+          const SizedBox(height: 12),
+          Column(
+            children: [
+              Center(
+                  child: FormButton(
+                label: StringConfig.submit,
+                onButtonPress: () {
+                  onSubmitPress(context);
+                },
+              )),
+              const SizedBox(height: 12),
+              const RegisterView()
+            ],
+          ),
+        ]),
+      ),
     );
   }
 }

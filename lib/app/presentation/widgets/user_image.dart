@@ -36,9 +36,14 @@ class _UserImageState extends State<UserImage> {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(120),
               border: Border.all(color: Colors.black, width: 1),
-              image: DecorationImage(
-                  image: FileImage(File(widget.image?.path ?? "")),
-                  fit: BoxFit.cover)),
+              image: widget.image == null
+                  ? const DecorationImage(
+                      image: NetworkImage(
+                          "https://i1.sndcdn.com/artworks-IrhmhgPltsdrwMu8-thZohQ-t500x500.jpg"),
+                      fit: BoxFit.cover)
+                  : DecorationImage(
+                      image: FileImage(File(widget.image!.path)),
+                      fit: BoxFit.cover)),
           child: Align(
             alignment: widget.image != null
                 ? Alignment.bottomCenter

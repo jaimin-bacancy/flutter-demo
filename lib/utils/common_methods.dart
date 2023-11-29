@@ -1,6 +1,8 @@
 // import 'package:device_info_plus/device_info_plus.dart';
+import 'package:awesome_app/app/presentation/screens/startup/startup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_storage/get_storage.dart';
 
 class DeviceInfo {
   int deviceType = 0;
@@ -51,5 +53,17 @@ class CommonMethods {
             content: Text(content),
           );
         });
+  }
+
+  static resetToStartUp(BuildContext context) {
+    final storage = GetStorage();
+    storage.erase();
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const StartupScreen(),
+      ),
+    );
   }
 }

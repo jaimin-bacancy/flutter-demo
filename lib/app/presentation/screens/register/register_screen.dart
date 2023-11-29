@@ -44,7 +44,9 @@ class _RegisterFormState extends State<RegisterForm> {
       CommonMethods.showAlert(
           context, Validation.validatePassword(_password) ?? "");
     } else {
-      ApiClient().userRegisterApi(_name, _email, _password).then((value) {
+      ApiClient(context)
+          .userRegisterApi(_name, _email, _password)
+          .then((value) {
         Navigator.pop(context);
         CommonMethods.showAlert(context, value.message);
       }).onError((error, stackTrace) {

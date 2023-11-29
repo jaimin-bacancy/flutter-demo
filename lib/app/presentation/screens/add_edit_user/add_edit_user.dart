@@ -1,5 +1,7 @@
-import 'package:awesome_app/app/data/models/user.dart';
+import 'package:awesome_app/app/data/models/myUser.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
+import 'package:awesome_app/app/data/riverpod/my_user_notifier.dart';
+import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_date_picker.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
@@ -8,10 +10,11 @@ import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
 import 'package:awesome_app/utils/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddEditUser extends StatelessWidget {
-  User? user;
+  MyUser? user;
   AddEditUser({super.key, this.user});
 
   @override
@@ -25,15 +28,15 @@ class AddEditUser extends StatelessWidget {
   }
 }
 
-class AddEditUserForm extends StatefulWidget {
-  User? user;
+class AddEditUserForm extends ConsumerStatefulWidget {
+  MyUser? user;
   AddEditUserForm({super.key, this.user});
 
   @override
-  State<AddEditUserForm> createState() => _AddEditUserFormState();
+  ConsumerState<AddEditUserForm> createState() => _AddEditUserFormState();
 }
 
-class _AddEditUserFormState extends State<AddEditUserForm> {
+class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
   String _name = "";
   String _email = "";
   XFile? _profileImage;
@@ -48,22 +51,30 @@ class _AddEditUserFormState extends State<AddEditUserForm> {
   }
 
   void onSubmitPress(context) {
+    TokenNotifier tokenNotifier = ref.read(tokenNotifierProvider.notifier);
+
     if (_name.isEmpty) {
       CommonMethods.showAlert(context, StringConfig.pleaseEnterName);
     } else if (Validation.validateEmail(_email) != null) {
       CommonMethods.showAlert(context, Validation.validateEmail(_email) ?? "");
     } else {
       if (widget.user != null) {
-        ApiClient()
+        ApiClient.withToken(context, tokenNotifier)
             .updateMyUserApi((widget.user?.id ?? ""), _name, _email)
             .then((value) {
+          ref.read(myUserNotifierProvider.notifier).updateMyUser(value.data);
+
           Navigator.pop(context, true);
           CommonMethods.showAlert(context, value.message);
         }).onError((error, stackTrace) {
           CommonMethods.showAlert(context, (error.toString()));
         });
       } else {
-        ApiClient().addMyUserApi(_name, _email).then((value) {
+        ApiClient.withToken(context, tokenNotifier)
+            .addMyUserApi(_name, _email)
+            .then((value) {
+          ref.read(myUserNotifierProvider.notifier).addNewMyUser(value.data);
+
           Navigator.pop(context, true);
           CommonMethods.showAlert(context, value.message);
         }).onError((error, stackTrace) {

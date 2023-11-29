@@ -1,10 +1,11 @@
 import 'package:awesome_app/app/presentation/screens/startup/startup_screen.dart';
-import 'package:awesome_app/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() {
-  runApp(const App());
-  SharedPrefUtils().init();
+void main() async {
+  await GetStorage.init();
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends StatelessWidget {

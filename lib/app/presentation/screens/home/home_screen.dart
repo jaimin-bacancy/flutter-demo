@@ -1,50 +1,56 @@
-import 'package:awesome_app/app/data/models/user.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:awesome_app/app/data/models/myUser.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
+import 'package:awesome_app/app/data/riverpod/my_user_notifier.dart';
+import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
 import 'package:awesome_app/app/presentation/screens/add_edit_user/add_edit_user.dart';
-import 'package:awesome_app/app/presentation/screens/startup/startup_screen.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
-import 'package:awesome_app/utils/shared_pref_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<User> _usersList = [];
-
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   void fetchMyUsers() {
-    ApiClient().getMyUsersApi().then((value) {
-      List<User> list = usersFromJson(value.data);
-      setState(() {
-        _usersList = list;
-      });
+    TokenNotifier tokenNotifier = ref.read(tokenNotifierProvider.notifier);
+
+    ApiClient.withToken(context, tokenNotifier).getMyUsersApi().then((value) {
+      ref
+          .read(myUserNotifierProvider.notifier)
+          .setMyUsers(usersFromJson(value.data));
+
+      setState(() {});
     }).onError((error, stackTrace) {
       CommonMethods.showAlert(context, (error.toString()));
     });
   }
 
   void deleteMyUser(String id) {
-    ApiClient().deleteMyUserApi(id).then((value) {
-      User deletedUser = User.fromJson(value.data);
-      setState(() {
-        _usersList.removeWhere((e) => e.id == deletedUser.id);
-      });
+    TokenNotifier tokenNotifier = ref.read(tokenNotifierProvider.notifier);
+
+    ApiClient.withToken(context, tokenNotifier)
+        .deleteMyUserApi(id)
+        .then((value) {
+      ref.read(myUserNotifierProvider.notifier).deleteSingleMyUser(id);
+      setState(() {});
     }).onError((error, stackTrace) {
       CommonMethods.showAlert(context, (error.toString()));
     });
   }
 
-  void onItemTap(User user) {
+  void onItemTap(MyUser user) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (_) => AddEditUser(user: user)))
         .then((val) {
       if (val is bool) {
-        fetchMyUsers();
+        setState(() {});
       }
     });
   }
@@ -57,6 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<MyUser> usersList =
+        ref.watch(myUserNotifierProvider.notifier).getMyUsers();
+
     return Scaffold(
       appBar: AppBar(actions: <Widget>[
         IconButton(
@@ -68,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 .push(MaterialPageRoute(builder: (_) => AddEditUser()))
                 .then((val) {
               if (val is bool) {
-                fetchMyUsers();
+                setState(() {});
               }
             });
           },
@@ -77,26 +86,20 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: const Icon(
             Icons.logout,
           ),
-          onPressed: () async {
-            await SharedPrefUtils().clearSharedPref();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const StartupScreen(),
-              ),
-            );
+          onPressed: () {
+            CommonMethods.resetToStartUp(context);
           },
         )
       ], title: const Text(StringConfig.usersText)),
       body: Container(
         child: ListView.builder(
-          itemCount: _usersList.length,
+          itemCount: usersList.length,
           itemBuilder: (context, index) {
             return HomeListItem(
-                user: _usersList[index],
+                user: usersList[index],
                 index: index,
-                onItemTap: () => onItemTap(_usersList[index]),
-                onDeleteTap: () => deleteMyUser(_usersList[index].id));
+                onItemTap: () => onItemTap(usersList[index]),
+                onDeleteTap: () => deleteMyUser(usersList[index].id));
           },
         ),
       ),
@@ -112,7 +115,7 @@ class HomeListItem extends StatelessWidget {
       required this.onDeleteTap,
       required this.onItemTap});
 
-  final User user;
+  final MyUser user;
   final int index;
   final Function onDeleteTap;
   final Function onItemTap;

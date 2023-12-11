@@ -19,9 +19,11 @@ abstract class ApiConfig {
   static const String addUser = 'user/addUser';
   static const String removeUser = 'removeUser';
   static const String updateUser = 'updateUser';
+  static const String upload = 'upload';
 
   // Api Parameters
   static const String email = 'email';
   static const String password = 'password';
   static const String name = 'name';
+  static const String profile = 'profile';
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_app/app/data/models/myUser.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/data/riverpod/my_user_notifier.dart';
@@ -70,15 +72,18 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
           CommonMethods.showAlert(context, (error.toString()));
         });
       } else {
-        ApiClient.withToken(context, tokenNotifier)
-            .addMyUserApi(_name, _email)
-            .then((value) {
-          ref.read(myUserNotifierProvider.notifier).addNewMyUser(value.data);
+        File file = File(_profileImage?.path ?? "");
+        ApiClient(context).upload(file).then((value) {
+          ApiClient.withToken(context, tokenNotifier)
+              .addMyUserApi(_name, _email, value.data)
+              .then((value) {
+            ref.read(myUserNotifierProvider.notifier).addNewMyUser(value.data);
 
-          Navigator.pop(context, true);
-          CommonMethods.showAlert(context, value.message);
-        }).onError((error, stackTrace) {
-          CommonMethods.showAlert(context, (error.toString()));
+            Navigator.pop(context, true);
+            CommonMethods.showAlert(context, value.message);
+          }).onError((error, stackTrace) {
+            CommonMethods.showAlert(context, (error.toString()));
+          });
         });
       }
     }

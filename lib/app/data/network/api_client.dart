@@ -2,7 +2,9 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:awesome_app/app/data/models/media.dart';
 import 'package:awesome_app/app/data/models/myUser.dart';
 import 'package:awesome_app/app/data/models/response.dart';
 import 'package:awesome_app/app/data/models/token.dart';
@@ -70,16 +72,18 @@ class ApiClient {
     }
   }
 
-  Future<Response<MyUser>> addMyUserApi(String name, String email) async {
+  Future<Response<MyUser>> addMyUserApi(
+      String name, String email, Media media) async {
     final response = await http.post(
       Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.addUser}'),
       headers: <String, String>{
         ApiConfig.contentType: 'application/json; charset=UTF-8',
         ApiConfig.authorization: "${ApiConfig.bearer} $token",
       },
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, dynamic>{
         ApiConfig.name: name,
         ApiConfig.email: email,
+        ApiConfig.profile: media,
       }),
     );
 
@@ -173,6 +177,36 @@ class ApiClient {
 
       Response errorResponse =
           Response.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+
+      throw Exception(errorResponse.message);
+    }
+  }
+
+  Future<Response<Media>> upload(File file) async {
+    var request = http.MultipartRequest(
+        "POST", Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.upload}'));
+
+    //create multipart using filepath, string or bytes
+    var pic = await http.MultipartFile.fromPath("image", file.path);
+    //add multipart to request
+    request.files.add(pic);
+
+    http.StreamedResponse response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+
+    if (response.statusCode == 200) {
+      Response<Media> successResponse =
+          Response.fromJsonWithT(jsonDecode(responseString), Media.fromJson);
+
+      return successResponse;
+    } else {
+      if (response.statusCode == 401) {
+        CommonMethods.resetToStartUp(context);
+      }
+
+      Response errorResponse =
+          Response.fromJsonWithT(jsonDecode(responseString), Media.fromJson);
 
       throw Exception(errorResponse.message);
     }

@@ -104,9 +104,9 @@ class ApiClient {
     }
   }
 
-  Future<Response> getMyUsersApi() async {
+  Future<Response> getMyUsersApi(String searchText) async {
     final response = await http.get(
-      Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.myUsers}'),
+      Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.myUsers}?query=$searchText'),
       headers: <String, String>{
         ApiConfig.contentType: 'application/json; charset=UTF-8',
         ApiConfig.authorization: "${ApiConfig.bearer} $token",

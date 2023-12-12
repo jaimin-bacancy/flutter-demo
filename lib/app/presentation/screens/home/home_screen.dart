@@ -18,10 +18,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  void fetchMyUsers() {
+  void fetchMyUsers(String searchText) {
     TokenNotifier tokenNotifier = ref.read(tokenNotifierProvider.notifier);
 
-    ApiClient.withToken(context, tokenNotifier).getMyUsersApi().then((value) {
+    ApiClient.withToken(context, tokenNotifier)
+        .getMyUsersApi(searchText)
+        .then((value) {
       ref
           .read(myUserNotifierProvider.notifier)
           .setMyUsers(usersFromJson(value.data));
@@ -57,52 +59,97 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void initState() {
-    fetchMyUsers();
+    fetchMyUsers("");
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.add,
+            ),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => AddEditUser()))
+                  .then((val) {
+                if (val is bool) {
+                  setState(() {});
+                }
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.logout,
+            ),
+            onPressed: () {
+              CommonMethods.resetToStartUp(context);
+            },
+          )
+        ], title: const Text(StringConfig.usersText)),
+        body: Column(
+          children: [
+            SearchInput(fetchMyUsers: fetchMyUsers),
+            Expanded(
+              flex: 1,
+              child: HomeList(deleteMyUser: deleteMyUser, onItemTap: onItemTap),
+            )
+          ],
+        ));
+  }
+}
+
+class SearchInput extends StatefulWidget {
+  const SearchInput({super.key, required this.fetchMyUsers});
+
+  final Function fetchMyUsers;
+
+  @override
+  State<SearchInput> createState() => _SearchInputState();
+}
+
+class _SearchInputState extends State<SearchInput> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        onChanged: (value) {
+          widget.fetchMyUsers(value);
+        },
+        decoration: const InputDecoration(
+            hintText: StringConfig.searchUserText,
+            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.search)),
+      ),
+    );
+  }
+}
+
+class HomeList extends ConsumerWidget {
+  const HomeList(
+      {super.key, required this.onItemTap, required this.deleteMyUser});
+
+  final Function deleteMyUser;
+  final Function onItemTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     List<MyUser> usersList =
         ref.watch(myUserNotifierProvider.notifier).getMyUsers();
 
-    return Scaffold(
-      appBar: AppBar(actions: <Widget>[
-        IconButton(
-          icon: const Icon(
-            Icons.add,
-          ),
-          onPressed: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => AddEditUser()))
-                .then((val) {
-              if (val is bool) {
-                setState(() {});
-              }
-            });
-          },
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.logout,
-          ),
-          onPressed: () {
-            CommonMethods.resetToStartUp(context);
-          },
-        )
-      ], title: const Text(StringConfig.usersText)),
-      body: Container(
-        child: ListView.builder(
-          itemCount: usersList.length,
-          itemBuilder: (context, index) {
-            return HomeListItem(
-                user: usersList[index],
-                index: index,
-                onItemTap: () => onItemTap(usersList[index]),
-                onDeleteTap: () => deleteMyUser(usersList[index].id));
-          },
-        ),
-      ),
+    return ListView.builder(
+      itemCount: usersList.length,
+      itemBuilder: (context, index) {
+        return HomeListItem(
+            user: usersList[index],
+            index: index,
+            onItemTap: () => onItemTap(usersList[index]),
+            onDeleteTap: () => deleteMyUser(usersList[index].id));
+      },
     );
   }
 }

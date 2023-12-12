@@ -18,6 +18,7 @@ abstract class StringConfig {
 
   //Users Screen
   static const String usersText = 'Users';
+  static const String searchUserText = "Search user...";
 
   //Add User Screen
   static const String addUserText = "Add User";

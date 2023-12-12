@@ -66,4 +66,35 @@ class CommonMethods {
       ),
     );
   }
+
+  static DateTime stringToDate(String dateString) {
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      throw Exception("Invalid date format.");
+    }
+  }
+
+  static int calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    if (currentDate.month < birthDate.month ||
+        (currentDate.month == birthDate.month &&
+            currentDate.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  static int getAgeFromStringDate(String dateString) {
+    DateTime birthDate = stringToDate(dateString);
+    return calculateAge(birthDate);
+  }
+
+  static int convertDateToAge(String dob) {
+    String dateString = dob;
+    int age = getAgeFromStringDate(dateString);
+
+    return age;
+  }
 }

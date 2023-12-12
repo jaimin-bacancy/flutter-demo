@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:awesome_app/app/data/models/myUser.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/data/riverpod/my_user_notifier.dart';
@@ -43,12 +41,21 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
   String _email = "";
   XFile? _profileImage;
   IconData _icon = Icons.add_a_photo;
-  DateTime selectedDate = DateTime.now();
+  DateTime? selectedDate;
+  DateTime eighteenYearsAgo = DateTime.now();
 
   @override
   void initState() {
     _name = widget.user?.name ?? "";
     _email = widget.user?.email ?? "";
+    if (widget.user?.dob != null) {
+      selectedDate = CommonMethods.stringToDate(widget.user!.dob);
+    }
+
+    DateTime currentDate = DateTime.now();
+    eighteenYearsAgo =
+        DateTime(currentDate.year - 18, currentDate.month, currentDate.day);
+
     super.initState();
   }
 
@@ -59,10 +66,13 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
       CommonMethods.showAlert(context, StringConfig.pleaseEnterName);
     } else if (Validation.validateEmail(_email) != null) {
       CommonMethods.showAlert(context, Validation.validateEmail(_email) ?? "");
+    } else if (selectedDate == null) {
+      CommonMethods.showAlert(context, StringConfig.pleaseSelectDOB);
     } else {
       if (widget.user != null) {
         ApiClient.withToken(context, tokenNotifier)
-            .updateMyUserApi((widget.user?.id ?? ""), _name, _email)
+            .updateMyUserApi(
+                (widget.user?.id ?? ""), _name, _email, null, selectedDate!)
             .then((value) {
           ref.read(myUserNotifierProvider.notifier).updateMyUser(value.data);
 
@@ -72,19 +82,19 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
           CommonMethods.showAlert(context, (error.toString()));
         });
       } else {
-        File file = File(_profileImage?.path ?? "");
-        ApiClient(context).upload(file).then((value) {
-          ApiClient.withToken(context, tokenNotifier)
-              .addMyUserApi(_name, _email, value.data)
-              .then((value) {
-            ref.read(myUserNotifierProvider.notifier).addNewMyUser(value.data);
+        // File file = File(_profileImage?.path ?? "");
+        // ApiClient(context).upload(file).then((value) {
+        ApiClient.withToken(context, tokenNotifier)
+            .addMyUserApi(_name, _email, null, selectedDate!)
+            .then((value) {
+          ref.read(myUserNotifierProvider.notifier).addNewMyUser(value.data);
 
-            Navigator.pop(context, true);
-            CommonMethods.showAlert(context, value.message);
-          }).onError((error, stackTrace) {
-            CommonMethods.showAlert(context, (error.toString()));
-          });
+          Navigator.pop(context, true);
+          CommonMethods.showAlert(context, value.message);
+        }).onError((error, stackTrace) {
+          CommonMethods.showAlert(context, (error.toString()));
         });
+        // });
       }
     }
   }
@@ -103,9 +113,9 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
     Future<void> _selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
           context: context,
-          initialDate: selectedDate,
+          initialDate: eighteenYearsAgo,
           firstDate: DateTime(1947),
-          lastDate: DateTime.now());
+          lastDate: eighteenYearsAgo);
 
       if (picked != null && picked != selectedDate) {
         setState(() {

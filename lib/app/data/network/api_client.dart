@@ -73,7 +73,7 @@ class ApiClient {
   }
 
   Future<Response<MyUser>> addMyUserApi(
-      String name, String email, Media media) async {
+      String name, String email, Media? media, DateTime dob) async {
     final response = await http.post(
       Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.addUser}'),
       headers: <String, String>{
@@ -84,6 +84,7 @@ class ApiClient {
         ApiConfig.name: name,
         ApiConfig.email: email,
         ApiConfig.profile: media,
+        ApiConfig.dob: dob.toString(),
       }),
     );
 
@@ -151,7 +152,7 @@ class ApiClient {
   }
 
   Future<Response<MyUser>> updateMyUserApi(
-      String id, String name, String email) async {
+      String id, String name, String email, Media? media, DateTime dob) async {
     final response = await http.put(
       Uri.parse(
           '${ApiConfig.baseUrl}/${ApiConfig.user}/$id/${ApiConfig.updateUser}'),
@@ -159,9 +160,11 @@ class ApiClient {
         ApiConfig.contentType: 'application/json; charset=UTF-8',
         ApiConfig.authorization: "${ApiConfig.bearer} $token",
       },
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, dynamic>{
         ApiConfig.name: name,
         ApiConfig.email: email,
+        ApiConfig.profile: media,
+        ApiConfig.dob: dob.toString(),
       }),
     );
 

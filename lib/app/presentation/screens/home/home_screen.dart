@@ -160,6 +160,10 @@ class HomeListItem extends StatelessWidget {
                     Text(user.email,
                         maxLines: 1,
                         style: const TextStyle(color: Colors.black)),
+                    Text(
+                        "${CommonMethods.convertDateToAge(user.dob).toString()} years",
+                        maxLines: 1,
+                        style: const TextStyle(color: Colors.black))
                   ],
                 )
               ],

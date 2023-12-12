@@ -36,6 +36,7 @@ abstract class StringConfig {
       'Password must contain at least one number and both uppercase and lowercase letters.';
   static const String pleaseProvideValidEmail = 'Please provide valid Email ID';
   static const String pleaseEnterEmail = 'Please enter Email ID';
+  static const String pleaseSelectDOB = 'Please select DOB';
   static const String emailPasswordCannotBeEmpty =
       "Email/Password cannot be empty";
   static const String nameEmailPasswordCannotBeEmpty =

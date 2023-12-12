@@ -1,8 +1,9 @@
+import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:flutter/material.dart';
 
 class FormDatePicker extends StatefulWidget {
   final String label;
-  final DateTime selectedDate;
+  final DateTime? selectedDate;
   final Function selectDate;
 
   const FormDatePicker({
@@ -42,7 +43,9 @@ class _FormDatePickerState extends State<FormDatePicker> {
               ),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Text("${widget.selectedDate.toLocal()}".split(' ')[0]),
+            child: Text(widget.selectedDate == null
+                ? StringConfig.selectDobText
+                : "${widget.selectedDate?.toLocal()}".split(' ')[0]),
           )
         ],
       ),

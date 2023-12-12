@@ -26,4 +26,5 @@ abstract class ApiConfig {
   static const String password = 'password';
   static const String name = 'name';
   static const String profile = 'profile';
+  static const String dob = 'dob';
 }

@@ -9,13 +9,16 @@ class MyUser {
   final String email;
   final String? createdBy;
   final Media? profile;
+  final String dob;
 
-  const MyUser(
-      {required this.name,
-      required this.id,
-      required this.email,
-      this.createdBy,
-      this.profile});
+  const MyUser({
+    required this.name,
+    required this.id,
+    required this.email,
+    required this.dob,
+    this.createdBy,
+    this.profile,
+  });
 
   factory MyUser.fromJson(Map<String, dynamic> json) {
     return MyUser(
@@ -23,7 +26,8 @@ class MyUser {
       id: json['_id'] as String,
       email: json['email'] as String,
       createdBy: json['createdBy'] as String,
-      // profile: Media.fromJson(json['profile']),
+      dob: json['dob'] as String,
+      profile: json['profile'] == null ? null : Media.fromJson(json['profile']),
     );
   }
 }

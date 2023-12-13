@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:awesome_app/app/data/models/myUser.dart';
+import 'package:awesome_app/app/data/models/pagination_data.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/data/riverpod/my_user_notifier.dart';
 import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
@@ -24,9 +25,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ApiClient.withToken(context, tokenNotifier)
         .getMyUsersApi(searchText)
         .then((value) {
-      ref
-          .read(myUserNotifierProvider.notifier)
-          .setMyUsers(usersFromJson(value.data));
+      List<MyUser> users =
+          paginationDataFromJson<MyUser>(value.data.items, MyUser.fromJson);
+
+      ref.read(myUserNotifierProvider.notifier).setMyUsers(users);
 
       setState(() {});
     }).onError((error, stackTrace) {
@@ -95,7 +97,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SearchInput(fetchMyUsers: fetchMyUsers),
             Expanded(
               flex: 1,
-              child: HomeList(deleteMyUser: deleteMyUser, onItemTap: onItemTap),
+              child: HomeList(
+                  deleteMyUser: deleteMyUser,
+                  onItemTap: onItemTap,
+                  fetchMyUsers: fetchMyUsers),
             )
           ],
         ));
@@ -131,25 +136,39 @@ class _SearchInputState extends State<SearchInput> {
 
 class HomeList extends ConsumerWidget {
   const HomeList(
-      {super.key, required this.onItemTap, required this.deleteMyUser});
+      {super.key,
+      required this.onItemTap,
+      required this.deleteMyUser,
+      required this.fetchMyUsers});
 
   final Function deleteMyUser;
   final Function onItemTap;
+  final Function fetchMyUsers;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     List<MyUser> usersList =
         ref.watch(myUserNotifierProvider.notifier).getMyUsers();
 
-    return ListView.builder(
-      itemCount: usersList.length,
-      itemBuilder: (context, index) {
-        return HomeListItem(
-            user: usersList[index],
-            index: index,
-            onItemTap: () => onItemTap(usersList[index]),
-            onDeleteTap: () => deleteMyUser(usersList[index].id));
+    return RefreshIndicator(
+      color: Colors.white,
+      backgroundColor: Colors.amber,
+      strokeWidth: 2.0,
+      onRefresh: () async {
+        fetchMyUsers("");
+
+        return;
       },
+      child: ListView.builder(
+        itemCount: usersList.length,
+        itemBuilder: (context, index) {
+          return HomeListItem(
+              user: usersList[index],
+              index: index,
+              onItemTap: () => onItemTap(usersList[index]),
+              onDeleteTap: () => deleteMyUser(usersList[index].id));
+        },
+      ),
     );
   }
 }

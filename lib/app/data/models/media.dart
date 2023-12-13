@@ -19,4 +19,10 @@ class Media {
       path: json['path'] as String,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        filename: filename,
+        id: id,
+        path: path,
+      };
 }

@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:awesome_app/app/data/models/media.dart';
 import 'package:awesome_app/app/data/models/myUser.dart';
+import 'package:awesome_app/app/data/models/paginated_response.dart';
 import 'package:awesome_app/app/data/models/response.dart';
 import 'package:awesome_app/app/data/models/token.dart';
 import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
@@ -104,7 +105,7 @@ class ApiClient {
     }
   }
 
-  Future<Response> getMyUsersApi(String searchText) async {
+  Future<PaginatedResponse<MyUser>> getMyUsersApi(String searchText) async {
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.myUsers}?query=$searchText'),
       headers: <String, String>{
@@ -114,14 +115,16 @@ class ApiClient {
     );
 
     if (response.statusCode == 200) {
-      return Response.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+      PaginatedResponse<MyUser> successResponse = PaginatedResponse.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>, MyUser.fromJson);
+
+      return successResponse;
     } else {
       if (response.statusCode == 401) {
         CommonMethods.resetToStartUp(context);
       }
-      Response errorResponse =
-          Response.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      PaginatedResponse errorResponse = PaginatedResponse.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>, MyUser.fromJson);
 
       throw Exception(errorResponse.message);
     }

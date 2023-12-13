@@ -30,4 +30,13 @@ class MyUser {
       profile: json['profile'] == null ? null : Media.fromJson(json['profile']),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "id": id,
+        "email": email,
+        "createdBy": createdBy,
+        "dob": dob,
+        "profile": profile?.toJson(),
+      };
 }

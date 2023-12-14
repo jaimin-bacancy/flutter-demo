@@ -105,9 +105,11 @@ class ApiClient {
     }
   }
 
-  Future<PaginatedResponse<MyUser>> getMyUsersApi(String searchText) async {
+  Future<PaginatedResponse<MyUser>> getMyUsersApi(
+      String searchText, int offset) async {
     final response = await http.get(
-      Uri.parse('${ApiConfig.baseUrl}/${ApiConfig.myUsers}?query=$searchText'),
+      Uri.parse(
+          '${ApiConfig.baseUrl}/${ApiConfig.myUsers}?query=$searchText&offset=$offset&limit=10'),
       headers: <String, String>{
         ApiConfig.contentType: 'application/json; charset=UTF-8',
         ApiConfig.authorization: "${ApiConfig.bearer} $token",

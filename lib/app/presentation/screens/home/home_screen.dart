@@ -19,19 +19,38 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  void fetchMyUsers(String searchText) {
+  bool _isLoading = false;
+  int _total = 0;
+  int _offset = 0;
+  String searchText = "";
+
+  void fetchMyUsers(String searchText, int offset) {
     TokenNotifier tokenNotifier = ref.read(tokenNotifierProvider.notifier);
+    setState(() {
+      _isLoading = true;
+    });
 
     ApiClient.withToken(context, tokenNotifier)
-        .getMyUsersApi(searchText)
+        .getMyUsersApi(searchText, offset)
         .then((value) {
       List<MyUser> users =
           paginationDataFromJson<MyUser>(value.data.items, MyUser.fromJson);
 
-      ref.read(myUserNotifierProvider.notifier).setMyUsers(users);
+      List<MyUser> prevData =
+          ref.read(myUserNotifierProvider.notifier).getMyUsers();
 
-      setState(() {});
+      prevData.addAll(users);
+      ref.read(myUserNotifierProvider.notifier).setMyUsers(prevData);
+
+      setState(() {
+        _isLoading = false;
+        _total = value.data.pagination.total;
+        _offset = value.data.pagination.offset;
+      });
     }).onError((error, stackTrace) {
+      setState(() {
+        _isLoading = false;
+      });
       CommonMethods.showAlert(context, (error.toString()));
     });
   }
@@ -61,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void initState() {
-    fetchMyUsers("");
+    fetchMyUsers("", 0);
     super.initState();
   }
 
@@ -94,10 +113,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ], title: const Text(StringConfig.usersText)),
         body: Column(
           children: [
-            SearchInput(fetchMyUsers: fetchMyUsers),
+            SearchInput(
+              fetchMyUsers: fetchMyUsers,
+              searchText: searchText,
+            ),
             Expanded(
               flex: 1,
               child: HomeList(
+                  searchText: searchText,
+                  offset: _offset,
+                  total: _total,
+                  isLoading: _isLoading,
                   deleteMyUser: deleteMyUser,
                   onItemTap: onItemTap,
                   fetchMyUsers: fetchMyUsers),
@@ -107,23 +133,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class SearchInput extends StatefulWidget {
-  const SearchInput({super.key, required this.fetchMyUsers});
+class SearchInput extends ConsumerStatefulWidget {
+  SearchInput(
+      {super.key, required this.fetchMyUsers, required this.searchText});
 
   final Function fetchMyUsers;
+  String searchText;
 
   @override
-  State<SearchInput> createState() => _SearchInputState();
+  ConsumerState<SearchInput> createState() => _SearchInputState();
 }
 
-class _SearchInputState extends State<SearchInput> {
+class _SearchInputState extends ConsumerState<SearchInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: TextField(
         onChanged: (value) {
-          widget.fetchMyUsers(value);
+          widget.searchText = value;
+          ref.read(myUserNotifierProvider.notifier).setMyUsers([]);
+          widget.fetchMyUsers(value, 0);
         },
         decoration: const InputDecoration(
             hintText: StringConfig.searchUserText,
@@ -134,19 +164,56 @@ class _SearchInputState extends State<SearchInput> {
   }
 }
 
-class HomeList extends ConsumerWidget {
-  const HomeList(
-      {super.key,
-      required this.onItemTap,
-      required this.deleteMyUser,
-      required this.fetchMyUsers});
+class HomeList extends ConsumerStatefulWidget {
+  const HomeList({
+    super.key,
+    required this.isLoading,
+    required this.total,
+    required this.offset,
+    required this.onItemTap,
+    required this.deleteMyUser,
+    required this.fetchMyUsers,
+    required this.searchText,
+  });
 
   final Function deleteMyUser;
   final Function onItemTap;
   final Function fetchMyUsers;
+  final bool isLoading;
+  final int total;
+  final int offset;
+  final String searchText;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeList> createState() => _HomeListState();
+}
+
+class _HomeListState extends ConsumerState<HomeList> {
+  ScrollController scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    scrollController.addListener(() {
+      if ((scrollController.position.maxScrollExtent ==
+              scrollController.offset) &&
+          !widget.isLoading) {
+        if (widget.total >= widget.offset + 10) {
+          widget.fetchMyUsers(widget.searchText, widget.offset + 10);
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     List<MyUser> usersList =
         ref.watch(myUserNotifierProvider.notifier).getMyUsers();
 
@@ -155,18 +222,19 @@ class HomeList extends ConsumerWidget {
       backgroundColor: Colors.amber,
       strokeWidth: 2.0,
       onRefresh: () async {
-        fetchMyUsers("");
+        widget.fetchMyUsers("", 0);
 
         return;
       },
       child: ListView.builder(
+        controller: scrollController,
         itemCount: usersList.length,
         itemBuilder: (context, index) {
           return HomeListItem(
               user: usersList[index],
               index: index,
-              onItemTap: () => onItemTap(usersList[index]),
-              onDeleteTap: () => deleteMyUser(usersList[index].id));
+              onItemTap: () => widget.onItemTap(usersList[index]),
+              onDeleteTap: () => widget.deleteMyUser(usersList[index].id));
         },
       ),
     );

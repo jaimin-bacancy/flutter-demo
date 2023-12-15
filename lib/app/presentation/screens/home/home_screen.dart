@@ -222,6 +222,7 @@ class _HomeListState extends ConsumerState<HomeList> {
       backgroundColor: Colors.amber,
       strokeWidth: 2.0,
       onRefresh: () async {
+        ref.read(myUserNotifierProvider.notifier).setMyUsers([]);
         widget.fetchMyUsers("", 0);
 
         return;

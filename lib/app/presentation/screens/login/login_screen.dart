@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:awesome_app/app/data/models/user.dart';
@@ -8,11 +10,14 @@ import 'package:awesome_app/app/presentation/screens/home/home_screen.dart';
 import 'package:awesome_app/app/presentation/screens/register/register_screen.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
+import 'package:awesome_app/app/services/google_auth_service.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
 import 'package:awesome_app/utils/validation.dart';
+import 'package:firebase_auth/firebase_auth.dart' as user;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -111,6 +116,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             const RegisterView()
           ],
         ),
+        const SizedBox(height: 12),
+        const SocialAuth()
       ]),
     );
   }
@@ -142,6 +149,77 @@ class RegisterView extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold)))
       ],
+    );
+  }
+}
+
+class SocialAuth extends StatelessWidget {
+  const SocialAuth({super.key});
+
+  void onGooglePress(BuildContext context) async {
+    bool isGoogleSignIn = await GoogleSignIn().isSignedIn();
+    if (isGoogleSignIn) {
+      user.User? currentUser = user.FirebaseAuth.instance.currentUser;
+      CommonMethods.showAlert(
+          context, "${currentUser?.displayName} you are logged in");
+    } else {
+      user.UserCredential credential =
+          await GoogleAuthService().signInWithGoogle();
+      CommonMethods.showAlert(
+          context, "${credential.user?.displayName} logged in successfully");
+    }
+  }
+
+  void onFacebookPress(BuildContext context) {
+    print("Facebook");
+  }
+
+  void onApplePress(BuildContext context) {
+    print("Apple");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SocialAuthItem(
+            icon: 'images/google_signin.png',
+            onPress: () {
+              onGooglePress(context);
+            }),
+        SocialAuthItem(
+            icon: 'images/google_signin.png',
+            onPress: () {
+              onFacebookPress(context);
+            }),
+        SocialAuthItem(
+            icon: 'images/google_signin.png',
+            onPress: () {
+              onApplePress(context);
+            })
+      ],
+    );
+  }
+}
+
+class SocialAuthItem extends StatelessWidget {
+  const SocialAuthItem({super.key, required this.icon, required this.onPress});
+
+  final Function onPress;
+  final String icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        onPress();
+      },
+      child: Image.asset(
+        icon,
+        width: 40,
+        height: 40,
+      ),
     );
   }
 }

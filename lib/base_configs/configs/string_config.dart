@@ -42,4 +42,7 @@ abstract class StringConfig {
       "Email/Password cannot be empty";
   static const String nameEmailPasswordCannotBeEmpty =
       "Name/Email/Password cannot be empty";
+
+  // Common
+  static const String ORText = 'OR';
 }

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleAuthService {
@@ -8,11 +7,11 @@ class GoogleAuthService {
           '966535779882-u0jpg4pqnfbj09rap788v5fq8u1gkmdb.apps.googleusercontent.com',
     ).signIn();
 
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+    GoogleSignInAuthentication gAuth = await gUser!.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-        accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+    // final credential = GoogleAuthProvider.credential(
+    //     accessToken: gAuth.accessToken, idToken: gAuth.idToken);
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    return gAuth;
   }
 }

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:awesome_app/app/data/models/google_signin_request_data.dart';
 import 'package:awesome_app/app/data/models/user.dart';
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
@@ -64,8 +65,8 @@ void onSubmitPress(BuildContext context, String email, String password,
 }
 
 class _LoginFormState extends ConsumerState<LoginForm> {
-  String _email = "jaimin@gmail.com";
-  String _password = "Jai@73min";
+  String _email = "";
+  String _password = "";
 
   @override
   Widget build(BuildContext context) {
@@ -113,11 +114,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               },
             )),
             const SizedBox(height: 12),
-            const RegisterView()
           ],
         ),
+        const Separator(),
+        const SocialAuth(),
         const SizedBox(height: 12),
-        const SocialAuth()
+        const RegisterView(),
       ]),
     );
   }
@@ -153,20 +155,38 @@ class RegisterView extends StatelessWidget {
   }
 }
 
-class SocialAuth extends StatelessWidget {
+class SocialAuth extends ConsumerWidget {
   const SocialAuth({super.key});
 
-  void onGooglePress(BuildContext context) async {
+  void onGooglePress(BuildContext context, WidgetRef ref) async {
+    await GoogleSignIn().signOut();
     bool isGoogleSignIn = await GoogleSignIn().isSignedIn();
     if (isGoogleSignIn) {
       user.User? currentUser = user.FirebaseAuth.instance.currentUser;
       CommonMethods.showAlert(
           context, "${currentUser?.displayName} you are logged in");
     } else {
-      user.UserCredential credential =
+      GoogleSignInAuthentication credential =
           await GoogleAuthService().signInWithGoogle();
-      CommonMethods.showAlert(
-          context, "${credential.user?.displayName} logged in successfully");
+
+      GoogleSignInRequestData data =
+          GoogleSignInRequestData(idToken: credential.idToken!);
+
+      ApiClient(context)
+          .userSocialLoginApi<GoogleSignInRequestData>("1", data.toJson())
+          .then((value) {
+        ref.read(tokenNotifierProvider.notifier).setAuthToken(value.data.token);
+        ref.read(userNotifierProvider.notifier).setCurrentUser(value.data.user);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+        );
+      }).onError((error, stackTrace) {
+        CommonMethods.showAlert(context, (error.toString()));
+      });
     }
   }
 
@@ -179,22 +199,22 @@ class SocialAuth extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SocialAuthItem(
             icon: 'images/google_signin.png',
             onPress: () {
-              onGooglePress(context);
+              onGooglePress(context, ref);
             }),
         SocialAuthItem(
-            icon: 'images/google_signin.png',
+            icon: 'images/facebook_signin.png',
             onPress: () {
               onFacebookPress(context);
             }),
         SocialAuthItem(
-            icon: 'images/google_signin.png',
+            icon: 'images/apple_signin.png',
             onPress: () {
               onApplePress(context);
             })
@@ -211,15 +231,42 @@ class SocialAuthItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onPress();
-      },
-      child: Image.asset(
-        icon,
-        width: 40,
-        height: 40,
+    return Container(
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
+      child: GestureDetector(
+        onTap: () {
+          onPress();
+        },
+        child: Image.asset(
+          icon,
+          width: 28,
+          height: 28,
+        ),
       ),
     );
+  }
+}
+
+class Separator extends StatelessWidget {
+  const Separator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(children: <Widget>[
+      Expanded(
+          child: Divider(
+        endIndent: 10,
+        indent: 10,
+        color: Colors.black38,
+      )),
+      Text(StringConfig.ORText),
+      Expanded(
+          child: Divider(
+        indent: 10,
+        endIndent: 10,
+        color: Colors.black38,
+      )),
+    ]);
   }
 }

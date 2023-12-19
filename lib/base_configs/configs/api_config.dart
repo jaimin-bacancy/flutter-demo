@@ -14,6 +14,7 @@ abstract class ApiConfig {
   // Api End Points
   static const String user = 'user';
   static const String login = 'user/login';
+  static const String socialLogin = 'user/socialLogin';
   static const String register = 'user/register';
   static const String myUsers = 'user/myUsers';
   static const String addUser = 'user/addUser';

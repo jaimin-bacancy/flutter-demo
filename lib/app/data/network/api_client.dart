@@ -45,6 +45,32 @@ class ApiClient {
     }
   }
 
+  Future<Response<Token>> userSocialLoginApi<T>(
+    String socialType,
+    Map<String, dynamic> extraData,
+  ) async {
+    final response = await http.post(
+      Uri.parse(
+          '${ApiConfig.baseUrl}/${ApiConfig.socialLogin}?socialType=$socialType'),
+      body: extraData,
+    );
+
+    if (response.statusCode == 200) {
+      Response<Token> successResponse =
+          Response.fromJsonWithT(jsonDecode(response.body), Token.fromJson);
+
+      return successResponse;
+    } else {
+      if (response.statusCode == 401) {
+        CommonMethods.resetToStartUp(context);
+      }
+      Response errorResponse =
+          Response.fromJsonWithT(jsonDecode(response.body), Token.fromJson);
+
+      throw Exception(errorResponse.message);
+    }
+  }
+
   Future<Response> userRegisterApi(
       String name, String email, String password) async {
     final response = await http.post(

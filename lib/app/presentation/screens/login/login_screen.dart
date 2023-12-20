@@ -49,8 +49,8 @@ void onSubmitPress(BuildContext context, String email, String password,
         context, Validation.validatePassword(password) ?? "");
   } else {
     ApiClient(context).userLoginApi(email, password).then((value) {
-      ref.read(tokenNotifierProvider.notifier).setAuthToken(value.data.token);
-      ref.read(userNotifierProvider.notifier).setCurrentUser(value.data.user);
+      ref.read(tokenNotifierProvider.notifier).setAuthToken(value.data!.token);
+      ref.read(userNotifierProvider.notifier).setCurrentUser(value.data!.user);
 
       Navigator.pushReplacement(
         context,
@@ -175,8 +175,12 @@ class SocialAuth extends ConsumerWidget {
       ApiClient(context)
           .userSocialLoginApi<GoogleSignInRequestData>("1", data.toJson())
           .then((value) {
-        ref.read(tokenNotifierProvider.notifier).setAuthToken(value.data.token);
-        ref.read(userNotifierProvider.notifier).setCurrentUser(value.data.user);
+        ref
+            .read(tokenNotifierProvider.notifier)
+            .setAuthToken(value.data!.token);
+        ref
+            .read(userNotifierProvider.notifier)
+            .setCurrentUser(value.data!.user);
 
         Navigator.pushReplacement(
           context,

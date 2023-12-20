@@ -35,9 +35,6 @@ class ApiClient {
 
       return successResponse;
     } else {
-      if (response.statusCode == 401) {
-        CommonMethods.resetToStartUp(context);
-      }
       Response errorResponse =
           Response.fromJsonWithT(jsonDecode(response.body), Token.fromJson);
 
@@ -61,9 +58,6 @@ class ApiClient {
 
       return successResponse;
     } else {
-      if (response.statusCode == 401) {
-        CommonMethods.resetToStartUp(context);
-      }
       Response errorResponse =
           Response.fromJsonWithT(jsonDecode(response.body), Token.fromJson);
 
@@ -89,9 +83,6 @@ class ApiClient {
       return Response.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);
     } else {
-      if (response.statusCode == 401) {
-        CommonMethods.resetToStartUp(context);
-      }
       Response errorResponse =
           Response.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
 

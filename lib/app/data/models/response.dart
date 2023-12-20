@@ -2,7 +2,7 @@ class Response<T> {
   final bool isSuccess;
   final String message;
   final int code;
-  final T data;
+  final T? data;
 
   const Response({
     required this.isSuccess,
@@ -17,7 +17,7 @@ class Response<T> {
       isSuccess: json['isSuccess'] as bool,
       message: json['message'] as String,
       code: json['code'] as int,
-      data: fromJsonT(json['data']),
+      data: json['data'] == null ? null : fromJsonT(json['data']),
     );
   }
 

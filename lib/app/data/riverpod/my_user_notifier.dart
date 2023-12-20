@@ -18,14 +18,18 @@ class MyUserNotifier extends _$MyUserNotifier {
     state.removeWhere((e) => e.id == id);
   }
 
-  void addNewMyUser(MyUser myUser) {
-    state.add(myUser);
+  void addNewMyUser(MyUser? myUser) {
+    if (myUser != null) {
+      state.add(myUser);
+    }
   }
 
-  void updateMyUser(MyUser myUser) {
-    int index = state.indexWhere((element) => element.id == myUser.id);
-    if (index > -1) {
-      state[index] = myUser;
+  void updateMyUser(MyUser? myUser) {
+    if (myUser != null) {
+      int index = state.indexWhere((element) => element.id == myUser.id);
+      if (index > -1) {
+        state[index] = myUser;
+      }
     }
   }
 

@@ -5,7 +5,10 @@ class GoogleAuthService {
   signInWithGoogle() async {
     final GoogleSignInAccount? gUser = await GoogleSignIn(
       clientId: dotenv.env['GOOGLE_CLIENT_ID'],
-    ).signIn();
+    ).signIn().onError((error, stackTrace) {
+      print(error);
+      return null;
+    });
 
     GoogleSignInAuthentication gAuth = await gUser!.authentication;
 

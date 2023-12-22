@@ -72,55 +72,57 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   Widget build(BuildContext context) {
     final userNotifier = ref.watch(userNotifierProvider);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        FormInput(
-          initialValue: _email,
-          label: StringConfig.emailIdText,
-          placeholderText: StringConfig.enterEmailText,
-          textInputAction: TextInputAction.next,
-          textInputType: TextInputType.emailAddress,
-          onChanged: (text) {
-            _email = text;
-          },
-          validator: (value) {
-            return Validation.validateEmail(value!);
-          },
-        ),
-        const SizedBox(height: 12),
-        FormInput(
-          initialValue: _password,
-          label: StringConfig.passwordText,
-          placeholderText: StringConfig.enterPasswordText,
-          obscureText: true,
-          textInputAction: TextInputAction.done,
-          textInputType: TextInputType.visiblePassword,
-          onChanged: (text) {
-            _password = text;
-          },
-          validator: (value) {
-            return Validation.validatePassword(value!);
-          },
-        ),
-        const SizedBox(height: 12),
-        Column(
-          children: [
-            Center(
-                child: FormButton(
-              label: StringConfig.submit,
-              onButtonPress: () {
-                onSubmitPress(context, _email, _password, ref, userNotifier);
-              },
-            )),
-            const SizedBox(height: 12),
-          ],
-        ),
-        const Separator(),
-        const SocialAuth(),
-        const SizedBox(height: 12),
-        const RegisterView(),
-      ]),
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          FormInput(
+            initialValue: _email,
+            label: StringConfig.emailIdText,
+            placeholderText: StringConfig.enterEmailText,
+            textInputAction: TextInputAction.next,
+            textInputType: TextInputType.emailAddress,
+            onChanged: (text) {
+              _email = text;
+            },
+            validator: (value) {
+              return Validation.validateEmail(value!);
+            },
+          ),
+          const SizedBox(height: 12),
+          FormInput(
+            initialValue: _password,
+            label: StringConfig.passwordText,
+            placeholderText: StringConfig.enterPasswordText,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            textInputType: TextInputType.visiblePassword,
+            onChanged: (text) {
+              _password = text;
+            },
+            validator: (value) {
+              return Validation.validatePassword(value!);
+            },
+          ),
+          const SizedBox(height: 12),
+          Column(
+            children: [
+              Center(
+                  child: FormButton(
+                label: StringConfig.submit,
+                onButtonPress: () {
+                  onSubmitPress(context, _email, _password, ref, userNotifier);
+                },
+              )),
+              const SizedBox(height: 12),
+            ],
+          ),
+          const Separator(),
+          const SocialAuth(),
+          const SizedBox(height: 12),
+          const RegisterView(),
+        ]),
+      ),
     );
   }
 }

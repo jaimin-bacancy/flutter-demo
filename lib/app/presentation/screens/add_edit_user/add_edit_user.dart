@@ -5,7 +5,6 @@ import 'package:awesome_app/app/data/riverpod/token_notifier.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_date_picker.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
-import 'package:awesome_app/app/presentation/widgets/user_image.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
 import 'package:awesome_app/utils/validation.dart';
@@ -110,7 +109,7 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
       setState(() {});
     }
 
-    Future<void> _selectDate(BuildContext context) async {
+    Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: eighteenYearsAgo,
@@ -127,11 +126,11 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UserImage(
-          image: _profileImage,
-          onImageSelect: handleImageSelect,
-          icon: _icon,
-        ),
+        // UserImage(
+        //   image: _profileImage,
+        //   onImageSelect: handleImageSelect,
+        //   icon: _icon,
+        // ),
         const SizedBox(height: 12),
         FormInput(
           initialValue: _name,
@@ -158,7 +157,7 @@ class _AddEditUserFormState extends ConsumerState<AddEditUserForm> {
         const SizedBox(height: 12),
         FormDatePicker(
           label: StringConfig.selectDobText,
-          selectDate: _selectDate,
+          selectDate: selectDate,
           selectedDate: selectedDate,
         ),
         const SizedBox(height: 12),

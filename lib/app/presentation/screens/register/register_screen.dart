@@ -1,7 +1,6 @@
 import 'package:awesome_app/app/data/network/api_client.dart';
 import 'package:awesome_app/app/presentation/widgets/form_button.dart';
 import 'package:awesome_app/app/presentation/widgets/form_input.dart';
-import 'package:awesome_app/app/presentation/widgets/user_image.dart';
 import 'package:awesome_app/base_configs/configs/string_config.dart';
 import 'package:awesome_app/utils/common_methods.dart';
 import 'package:awesome_app/utils/validation.dart';
@@ -70,11 +69,11 @@ class _RegisterFormState extends State<RegisterForm> {
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UserImage(
-            image: _profileImage,
-            onImageSelect: handleImageSelect,
-            icon: _icon,
-          ),
+          // UserImage(
+          //   image: _profileImage,
+          //   onImageSelect: handleImageSelect,
+          //   icon: _icon,
+          // ),
           const SizedBox(height: 12),
           FormInput(
             initialValue: _name,

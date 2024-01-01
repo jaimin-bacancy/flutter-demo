@@ -214,16 +214,16 @@ class SocialAuth extends ConsumerWidget {
             onPress: () {
               onGooglePress(context, ref);
             }),
-        SocialAuthItem(
-            icon: 'images/facebook_signin.png',
-            onPress: () {
-              onFacebookPress(context);
-            }),
-        SocialAuthItem(
-            icon: 'images/apple_signin.png',
-            onPress: () {
-              onApplePress(context);
-            })
+        // SocialAuthItem(
+        //     icon: 'images/facebook_signin.png',
+        //     onPress: () {
+        //       onFacebookPress(context);
+        //     }),
+        // SocialAuthItem(
+        //     icon: 'images/apple_signin.png',
+        //     onPress: () {
+        //       onApplePress(context);
+        //     })
       ],
     );
   }

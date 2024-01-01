@@ -271,20 +271,20 @@ class HomeListItem extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(34),
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    size: 24,
-                  ),
-                ),
+                // Container(
+                //   padding: const EdgeInsets.all(10),
+                //   margin: const EdgeInsets.only(right: 10),
+                //   decoration: BoxDecoration(
+                //     border: Border.all(
+                //       width: 1,
+                //     ),
+                //     borderRadius: BorderRadius.circular(34),
+                //   ),
+                //   child: const Icon(
+                //     Icons.person,
+                //     size: 24,
+                //   ),
+                // ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
